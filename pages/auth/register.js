@@ -1,24 +1,35 @@
-import React from 'react';
+import React, {useState} from 'react';
+import { useDispatch } from 'react-redux';
 import { connect } from 'react-redux';
-import { increaseAsync, decreaseAsync } from '@/modules/basic/counter';
-import { Counter } from '@/components/basic/Counter';
+import { userRegister } from '@/modules/auth/user';
+import { Register } from '@/components/auth/Register';
 
-const CounterPage = ({ number, increaseAsync, decreaseAsync }) => {
+const RegisterPage = () => {
+    const [user, setUser] =useState({
+        userid:'', password:'', email:'', name:'', phone:'', birth:'', address:''
+    })
+    const dispatch = useDispatch()
+    const onChange = e =>{
+        e.preventDefault()
+        const{name, value} = e.target;
+        setUser({...user,[name]: value})
+    }
+    const onSubmit = e => {
+        e.preventDefault()
+        alert('회원가입정보: '+JSON.stringify(user))
+        dispatch(userRegister(user))
+        //window.location.href = "./login"
+    }
   return (
-    <Counter
-      number={number}
-      onIncrease={increaseAsync}
-      onDecrease={decreaseAsync}
-    />
+    <Register onChange={onChange} onSubmit={onSubmit}  />
   );
 };
 
 export default connect(
   state => ({
-    number: state.counter
+    user: state.user
   }),
   {
-    increaseAsync,
-    decreaseAsync
+    userRegister
   }
-)(CounterPage);
+)(RegisterPage);
