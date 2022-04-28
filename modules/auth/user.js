@@ -9,25 +9,29 @@ const headers = {
     Authorization: "JWT fefege..."
 }
 export const initialState = {
-    user: {
-        isLoggingIn: false,
-        data: null
-    }
+    user: null,
+    loginLoading: false,
+    loginSuccced: false,
+    loginError: null 
 }
 
 const USER_REGISTER_REQUEST = 'auth/USER_REGISTER_REQUEST';
 const USER_REGISTER_SUCCESS = 'auth/USER_REGISTER_SUCCESS';
 const USER_REGISTER_FAILURE = 'auth/USER_REGISTER_FAILURE';
 
-export const userRegister = user => (
-    {type: USER_REGISTER_REQUEST, payload: user}
-)
+export const userRegister = user => {
+    console.log(" **** userRegister *** "+JSON.stringify(user))
+    return  {type: USER_REGISTER_REQUEST, payload: user}
+}
+   
+
 export function* watchUserRegister() {
     yield takeLatest(USER_REGISTER_REQUEST, userRegisterSaga);
 }
-function* userRegisterSaga() {
+function* userRegisterSaga(action) {
     try {
-        const response = yield call(userRegisterAPI)
+        console.log(" **** 여기가 핵심 *** "+JSON.stringify(action))
+        const response = yield call(userRegisterAPI, action.payload)
         console.log(" 회원가입 서버다녀옴: " + JSON.stringify(response.data))
         yield put({type: USER_REGISTER_SUCCESS, payload: response.data})
     } catch (error) {
@@ -49,7 +53,7 @@ const auth = (state = initialState, action) => {
                 ...action.payload
             }
         case USER_REGISTER_SUCCESS:
-            console.log(' ### 회원가입 성공 ### ' + action.payload)
+            console.log(' ### 회원가입 성공 ### ' + JSON.stringify(action.payload))
             return {
                 ...state,
                 user: action.payload
