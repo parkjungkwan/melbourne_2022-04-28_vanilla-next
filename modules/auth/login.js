@@ -26,4 +26,30 @@ export const loginRequest = createAction(LOGIN_REQUEST, data => data)
 export const loginCancelled = createAction(LOGIN_CANCELLED, data => data)
 export const logoutRequest = createAction(LOGOUT_REQUEST, data => data)
 
-
+export function* loginSaga() {
+    yield takeLatest(LOGIN_REQUEST, signin)
+   
+}
+function* signin(action) {
+    try {
+        console.log(" **** 여기가 핵심 *** "+JSON.stringify(action))
+        const response = yield call(loginAPI, action.payload)
+        console.log(" 로그인 서버다녀옴: " + JSON.stringify(response.data))
+        yield put({type: LOGIN_SUCCESS, payload: response.data})
+        yield put({type: SAVE_TOKEN, payload: response.data})
+        yield put(window.location.href="/user/profile")
+    } catch (error) {
+        yield put({type: LOGIN_FAILURE, payload: error.message})
+    }
+}
+const loginAPI = payload => axios.post(
+    `${SERVER}/user/login`,
+    payload,
+    {headers}
+)
+const login = handleActions({
+    [HYDRATE] : (state, action) => ({
+        ...state, ...action.payload
+    })
+}, initialState)
+export default login
